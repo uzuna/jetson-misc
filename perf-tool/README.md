@@ -13,6 +13,30 @@ make -C perf-tool deb
 sudo dpkg -i ./deb/linux-perf-jetson_*.deb
 ```
 
+### build on L4T35.4.1
+
+Need additional install
+
+- DWARF: `libdw-dev libdwarf-dev`
+- PYTHON: `python3-dev`
+
+and change `Makefile.config`
+
+```diff
+PYTHON_AUTO := python
+PYTHON_AUTO := $(if $(call get-executable,python3),python3,$(PYTHON_AUTO))
+- PYTHON_AUTO := $(if $(call get-executable,python),python,$(PYTHON_AUTO))
+- PYTHON_AUTO := $(if $(call get-executable,python2),python2,$(PYTHON_AUTO))
++ # PYTHON_AUTO := $(if $(call get-executable,python),python,$(PYTHON_AUTO))
++ # PYTHON_AUTO := $(if $(call get-executable,python2),python2,$(PYTHON_AUTO))
+```
+
+```sh
+sudo apt install libdw-dev libdwarf-dev python3-dev 
+
+make -C perf-tool deb
+```
+
 ## How to use
 
 ```sh
