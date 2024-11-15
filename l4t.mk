@@ -17,6 +17,7 @@ endif
 # env
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 PROJECT_DIR := $(patsubst %/,%,$(dir $(mkfile_path)))
+DEB_DIR := ${PROJECT_DIR}/deb
 
 # L4T download definition
 L4T_BASE_URL:=https://developer.download.nvidia.com/embedded/L4T/r$(MAJOR)_Release_v$(MINOR)
@@ -41,6 +42,7 @@ L4T_ROOT_FS_DIR:=$(L4T_EXTRACT_DIR)/rootfs
 L4T_BSP_TBZ:=$(L4T_DL_DIR)/$(L4T_RELEASE_PACKAGE)
 L4T_FS_TBZ:=$(L4T_DL_DIR)/$(SAMPLE_FS_PACKAGE)
 L4T_SOURCE_TBZ:=$(L4T_DL_DIR)/$(L4T_SOURCE_PACKAGE_RENAMED)
+KERNEL_VERSION:=$(PROJECT_DIR)/KERNEL_VERSION
 
 #
 # L4Tのバージョンによる差異の吸収
@@ -97,3 +99,10 @@ $(L4T_FS_TBZ):
 $(L4T_SOURCE_TBZ):
 	mkdir -p $(L4T_DL_DIR)
 	wget -c $(SOURCE_ADDR)/$(L4T_SOURCE_PACKAGE) -O $(L4T_SOURCE_TBZ)
+
+.PHONY: kernelversion
+kernelversion: $(KERNEL_VERSION)
+$(KERNEL_VERSION): $(KERNEL_DIR)
+# kernelからバージョンを取得
+# make[no]の出力はフィルタしてバージョンだけ書き込む
+	make -s -C $(KERNEL_DIR) kernelversion >&1 | grep -v make > $(KERNEL_VERSION)

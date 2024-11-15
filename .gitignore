@@ -1,2 +1,5 @@
 Linux_for_Tegra
 downloads
+pkg-build
+deb/
+KERNEL_VERSION

@@ -1,0 +1,28 @@
+{
+    "name": "linux-perf-jetson",
+    "version": "!version!",
+    "maintainer": "FUJINAKA Fumiya <uzuna.kf@gmail.com>",
+    "arch": "!arch!",
+    "homepage": "https://github.com/uzuna/jetson-misc",
+    "description": "perf tool for L4T",
+    "files": [
+        {
+            "from": "PERF_DIR/perf",
+            "to": "/opt/perf/",
+            "base": "PERF_DIR",
+            "fperm": "0755"
+        },
+        {
+            "from": "PERF_DIR/scripts/python/*.py",
+            "to": "/opt/perf/libexec/perf-core/",
+            "base": "PERF_DIR",
+            "fperm": "0755"
+        },
+        {
+            "from": "PERF_DIR/scripts/python/bin/*",
+            "to": "/opt/perf/libexec/perf-core/",
+            "base": "PERF_DIR",
+            "fperm": "0755"
+        }
+    ]
+}
