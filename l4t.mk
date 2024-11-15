@@ -15,4 +15,51 @@ else
 endif
 
 # env
-PWD:=$(shell pwd)
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+PROJECT_DIR := $(patsubst %/,%,$(dir $(mkfile_path)))
+
+# L4T download definition
+L4T_BASE_URL:=https://developer.download.nvidia.com/embedded/L4T/r${MAJOR}_Release_v${MINOR}
+RELEASE_ADDR:=${L4T_BASE_URL}/release
+SOURCE_ADDR:=${L4T_BASE_URL}/sources
+
+# bsp definition
+L4T_RELEASE_PACKAGE:=Jetson_Linux_R${MAJOR}.${MINOR}_aarch64.tbz2
+SAMPLE_FS_PACKAGE:=Tegra_Linux_Sample-Root-Filesystem_R${MAJOR}.${MINOR}_aarch64.tbz2
+
+# extract definition
+L4T_EXTRACT_DIR:=$(PROJECT_DIR)/Linux_for_Tegra
+L4T_DL_DIR:=$(PROJECT_DIR)/downloads
+
+L4T_TOOL_DIR:=$(L4T_EXTRACT_DIR)/tools
+L4T_ROOT_FS_DIR:=$(L4T_EXTRACT_DIR)/rootfs
+L4T_BSP_TBZ:=$(L4T_DL_DIR)/$(L4T_RELEASE_PACKAGE)
+L4T_FS_TBZ:=$(L4T_DL_DIR)/$(SAMPLE_FS_PACKAGE)
+
+
+# flashに必要なスクリプトの展開
+$(L4T_TOOL_DIR): ${L4T_BSP_TBZ}
+	tar xf ${L4T_BSP_TBZ} -C $(PROJECT_DIR) 
+# 二回目の展開を防ぐためにtouch
+	touch $(L4T_TOOL_DIR)
+
+# rootfsの展開
+$(L4T_ROOT_FS_DIR): $(L4T_TOOL_DIR) $(L4T_FS_TBZ)
+	mkdir -p $(L4T_ROOT_FS_DIR)
+	sudo tar xpf ${L4T_FS_TBZ} -C $(L4T_ROOT_FS_DIR)
+# 二回目の展開を防ぐためにtouch
+	touch $(L4T_ROOT_FS_DIR)
+
+#
+# L4T関係のダウンロード
+#
+.PHONY: download
+download: ${L4T_BSP_TBZ} ${L4T_FS_TBZ}
+
+$(L4T_BSP_TBZ):
+	mkdir -p $(L4T_DL_DIR)
+	wget -P $(L4T_DL_DIR) ${RELEASE_ADDR}/${L4T_RELEASE_PACKAGE}
+
+$(L4T_FS_TBZ):
+	mkdir -p $(L4T_DL_DIR)
+	wget -P $(L4T_DL_DIR) ${RELEASE_ADDR}/${SAMPLE_FS_PACKAGE}
