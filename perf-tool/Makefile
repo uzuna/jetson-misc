@@ -11,7 +11,7 @@ DESTDIR:=/opt/perf
 PACKAGE_NAME:=$(shell cat deb.json | jq -r '.name')
 
 .PHONY: deb
-deb: deb.json $(KERNEL_VERSION)
+deb: build deb.json $(KERNEL_VERSION)
 	@rm -rf ${DEB_DIR}/${PACKAGE_NAME}*.deb
 	@rm -rf pkg-build
 	mkdir -p ${DEB_DIR}
